@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch Result — Car Registration OCR</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f5f5;
+            color: #111;
+            min-height: 100vh;
+        }
+        .app {
+            width: 100%;
+            max-width: 880px;
+            margin: 0 auto;
+            background: #fff;
+            min-height: 100vh;
+            padding: 2rem 1.5rem 3rem;
+        }
+        @media (min-width: 900px) {
+            .app {
+                min-height: auto;
+                margin: 2rem auto;
+                border-radius: 24px;
+                box-shadow: 0 4px 60px rgba(0,0,0,0.06);
+                padding: 2.5rem 2rem 3rem;
+            }
+        }
+        .header { margin-bottom: 1.5rem; }
+        .header-tag {
+            display: inline-block;
+            background: #111;
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            padding: 0.35rem 0.9rem;
+            border-radius: 20px;
+            margin-bottom: 1.1rem;
+        }
+        .header h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            line-height: 1.15;
+            margin-bottom: 0.35rem;
+        }
+        .header p {
+            color: #9a9a9a;
+            font-size: 0.86rem;
+            line-height: 1.45;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+            margin: 1.5rem 0 2rem;
+        }
+        .summary-card {
+            background: #fafafa;
+            border-radius: 16px;
+            padding: 1rem;
+        }
+        .summary-card .label {
+            color: #9f9f9f;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.35rem;
+        }
+        .summary-card .value {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        .banner {
+            background: #f0fdf4;
+            color: #15803d;
+            padding: 0.9rem 1rem;
+            border-radius: 14px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+        }
+        .banner a { color: #111; font-weight: 700; }
+        .section-title {
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #bbb;
+            margin-bottom: 0.9rem;
+        }
+        .result-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+        }
+        .result-card {
+            background: #fafafa;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid #efefef;
+        }
+        .result-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            align-items: center;
+            padding: 1rem 1rem 0.9rem;
+        }
+        .result-head h2 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            word-break: break-word;
+        }
+        .plate-pill {
+            background: #111;
+            color: #fff;
+            border-radius: 999px;
+            padding: 0.45rem 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .plate-pill.empty {
+            background: #e6e6e6;
+            color: #999;
+        }
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.6rem;
+            padding: 0 1rem 1rem;
+        }
+        .field {
+            background: #fff;
+            border-radius: 14px;
+            padding: 0.8rem 0.9rem;
+            min-height: 72px;
+            border: 1px solid #f0f0f0;
+        }
+        .field.full { grid-column: 1 / -1; }
+        .field-label {
+            color: #9f9f9f;
+            font-size: 0.68rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.3rem;
+        }
+        .field-value {
+            font-size: 0.86rem;
+            font-weight: 600;
+            word-break: break-word;
+            line-height: 1.4;
+        }
+        .field-value.empty {
+            color: #d0d0d0;
+            font-style: italic;
+            font-weight: 400;
+        }
+        .actions {
+            display: flex;
+            gap: 0.6rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        .btn {
+            flex: 1;
+            min-width: 170px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.95rem 1rem;
+            border: none;
+            border-radius: 14px;
+            font-family: inherit;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.15s;
+        }
+        .btn-dark { background: #111; color: #fff; }
+        .btn-dark:hover { background: #333; }
+        .btn-outline {
+            background: #fff;
+            color: #111;
+            border: 2px solid #e5e5e5;
+        }
+        .btn-outline:hover { border-color: #ccc; background: #fafafa; }
+        .btn svg { width: 16px; height: 16px; }
+        footer {
+            text-align: center;
+            color: #ddd;
+            font-size: 0.72rem;
+            margin-top: 2rem;
+        }
+        @media (max-width: 720px) {
+            .summary-grid { grid-template-columns: repeat(2, 1fr); }
+            .result-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="header">
+            <span class="header-tag">Batch Result</span>
+            <h1>{{ total_files }} files processed</h1>
+            <p>Review each extraction below, then export everything as XML or open the destination sheet.</p>
+        </div>
+
+        {% if sheet_url %}
+        <div class="banner">
+            Saved {{ saved_count }} rows to Google Sheets{% if row_num %} (last row {{ row_num }}){% endif %} —
+            <a href="{{ sheet_url }}" target="_blank">Open Sheet</a>
+        </div>
+        {% endif %}
+
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="label">Files</div>
+                <div class="value">{{ total_files }}</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Saved</div>
+                <div class="value">{{ saved_count }}</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">With plates</div>
+                <div class="value">{{ detected_count }}</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Export</div>
+                <div class="value">XML</div>
+            </div>
+        </div>
+
+        <div class="section-title">Extracted Files</div>
+        <div class="result-list">
+            {% for item in results %}
+            <div class="result-card">
+                <div class="result-head">
+                    <h2>{{ item.filename }}</h2>
+                    <div class="plate-pill {% if not item.fields.license_plate %}empty{% endif %}">
+                        {{ item.fields.license_plate or 'No plate' }}
+                    </div>
+                </div>
+                <div class="result-grid">
+                    <div class="field">
+                        <div class="field-label">Make / Model</div>
+                        <div class="field-value {% if not item.fields.vehicle_make and not item.fields.vehicle_model %}empty{% endif %}">
+                            {% if item.fields.vehicle_make or item.fields.vehicle_model %}
+                                {{ item.fields.vehicle_make or '' }}{% if item.fields.vehicle_make and item.fields.vehicle_model %} / {% endif %}{{ item.fields.vehicle_model or '' }}
+                            {% else %}
+                                Not detected
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Type / Color</div>
+                        <div class="field-value {% if not item.fields.vehicle_type and not item.fields.color %}empty{% endif %}">
+                            {% if item.fields.vehicle_type or item.fields.color %}
+                                {{ item.fields.vehicle_type or '—' }} / {{ item.fields.color or '—' }}
+                            {% else %}
+                                Not detected
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="field full">
+                        <div class="field-label">VIN</div>
+                        <div class="field-value {% if not item.fields.vin %}empty{% endif %}">{{ item.fields.vin or 'Not detected' }}</div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Registration Dates</div>
+                        <div class="field-value {% if not item.fields.registration_date and not item.fields.first_registration_date %}empty{% endif %}">
+                            {{ item.fields.registration_date or '—' }} / {{ item.fields.first_registration_date or '—' }}
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Engine</div>
+                        <div class="field-value {% if not item.fields.engine_capacity_cc and not item.fields.engine_power_kw %}empty{% endif %}">
+                            {% if item.fields.engine_capacity_cc or item.fields.engine_power_kw %}
+                                {{ item.fields.engine_capacity_cc or '—' }} cc / {{ item.fields.engine_power_kw or '—' }} kW
+                            {% else %}
+                                Not detected
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Fuel / Seats</div>
+                        <div class="field-value {% if not item.fields.fuel_type and not item.fields.num_seats %}empty{% endif %}">
+                            {% if item.fields.fuel_type or item.fields.num_seats %}
+                                {{ item.fields.fuel_type or '—' }} / {{ item.fields.num_seats or '—' }} seats
+                            {% else %}
+                                Not detected
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="field-label">Owner</div>
+                        <div class="field-value {% if not item.fields.owner_name %}empty{% endif %}">{{ item.fields.owner_name or 'Not detected' }}</div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="actions">
+            <a href="/" class="btn btn-dark">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"/>
+                </svg>
+                Process More Files
+            </a>
+            <a href="/export/xml/{{ export_id }}" class="btn btn-outline">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+                </svg>
+                XML
+            </a>
+            <a href="/export/csv/{{ export_id }}" class="btn btn-outline">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 01-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0112 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M12 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M21.375 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125M12 14.625v-1.5m0 1.5c0 .621.504 1.125 1.125 1.125M12 14.625c0 .621-.504 1.125-1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 0v1.5c0 .621-.504 1.125-1.125 1.125"/>
+                </svg>
+                CSV
+            </a>
+            <button type="button" class="btn btn-outline" id="copyExcel" title="Copy tab-separated data for pasting into Excel">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"/>
+                </svg>
+                <span id="copyLabel">Copy</span>
+            </button>
+            {% if sheet_url %}
+            <a href="{{ sheet_url }}" target="_blank" class="btn btn-outline">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/>
+                </svg>
+                Open Sheet
+            </a>
+            {% endif %}
+        </div>
+
+        <footer>Powered by Tesseract &amp; Flask</footer>
+    </div>
+
+    <script>
+        /* Copy tab-separated data for pasting into Excel */
+        document.getElementById('copyExcel').addEventListener('click', function() {
+            const results = {{ results | tojson }};
+            const headers = ['Filename','License Plate','Owner Name','Owner Address','Vehicle Make','Vehicle Model','Vehicle Type','VIN','Registration Date','First Registration Date','Engine Capacity (cc)','Engine Power (kW)','Engine Power (HP)','Fuel Type','Color','Number of Seats','Max Weight (kg)','CO2 Emissions','Mileage'];
+            const keys = ['license_plate','owner_name','owner_address','vehicle_make','vehicle_model','vehicle_type','vin','registration_date','first_registration_date','engine_capacity_cc','engine_power_kw','engine_power_hp','fuel_type','color','num_seats','max_weight_kg','co2_emissions','mileage'];
+            const rows = results.map(r => [r.filename].concat(keys.map(k => (r.fields||{})[k] || '')).join('\t'));
+            const tsv = headers.join('\t') + '\n' + rows.join('\n');
+            navigator.clipboard.writeText(tsv).then(() => {
+                const label = document.getElementById('copyLabel');
+                label.textContent = 'Copied!';
+                setTimeout(() => label.textContent = 'Copy', 1500);
+            });
+        });
+    </script>
+</body>
+</html>

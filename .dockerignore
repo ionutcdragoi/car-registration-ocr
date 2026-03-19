@@ -1,0 +1,13 @@
+credentials.json
+.env
+.env.example
+uploads/
+test_img*
+test_*.py
+*.bak
+__pycache__/
+.git/
+.gitignore
+*.md
+venv/
+.vscode/

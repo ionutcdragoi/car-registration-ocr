@@ -1,0 +1,24 @@
+# Environment
+.env
+credentials.json
+venv/
+__pycache__/
+*.pyc
+
+# Uploads (runtime only)
+uploads/
+
+# Test assets
+test_img*
+test_*.py
+*_backup.py
+check_imgs.py
+raw_test.py
+debug_*.py
+deep_test.py
+
+# Editor / OS
+.vscode/
+*.bak
+Thumbs.db
+.DS_Store
