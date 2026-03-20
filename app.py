@@ -25,6 +25,9 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", os.urandom(32).hex())
 
+# ── Version ────────────────────────────────────────────────
+APP_VERSION = "1.1.0"
+
 # ── Configuration ──────────────────────────────────────────
 UPLOAD_FOLDER = Path(__file__).parent / "uploads"
 UPLOAD_FOLDER.mkdir(exist_ok=True)
@@ -181,7 +184,7 @@ def health():
 @app.route("/")
 def index():
     """Main page with upload form."""
-    return render_template("index.html", max_files=MAX_FILES_PER_REQUEST)
+    return render_template("index.html", max_files=MAX_FILES_PER_REQUEST, app_version=APP_VERSION)
 
 
 @app.route("/upload", methods=["POST"])
