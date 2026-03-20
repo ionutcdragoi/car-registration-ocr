@@ -245,6 +245,33 @@
         .btn-outline:hover { border-color: var(--text-muted); background: var(--bg-subtle); }
         .btn svg { width: 16px; height: 16px; }
 
+        /* ── Edit mode ── */
+        .edit-bar { display: none; gap: 0.5rem; margin-bottom: 1rem; }
+        .edit-bar.visible { display: flex; }
+        .btn-edit {
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            gap: 0.45rem; padding: 0.72rem 1rem; border-radius: 14px;
+            font-family: inherit; font-size: 0.82rem; font-weight: 600;
+            cursor: pointer; transition: all 0.15s;
+        }
+        .btn-edit-toggle { background: var(--bg-subtle); color: var(--text-muted); border: 1.5px solid var(--border); }
+        .btn-edit-toggle:hover { border-color: var(--accent); color: var(--text); }
+        .btn-edit-save { background: var(--accent); color: var(--accent-inv); border: 1.5px solid var(--accent); }
+        .btn-edit-save:hover { opacity: 0.82; }
+        .btn-edit-cancel { flex: 0; padding: 0.72rem 0.9rem; background: var(--bg-subtle); color: var(--text-muted); border: 1.5px solid var(--border); }
+        .btn-edit-cancel:hover { color: var(--text); border-color: var(--accent); }
+        [data-field][contenteditable="true"] {
+            outline: none; border-radius: 8px; padding: 0.15rem 0.45rem !important;
+            cursor: text; min-width: 60px; display: inline-block;
+            background: var(--bg-card) !important; border: 1.5px solid var(--accent) !important;
+            font-style: normal !important; font-weight: 600 !important; color: var(--text) !important;
+        }
+        .plate-card [data-field][contenteditable="true"] {
+            background: rgba(127,127,127,0.2) !important;
+            border-color: rgba(200,200,200,0.6) !important;
+            color: var(--accent-inv) !important;
+        }
+
         footer { text-align: center; color: var(--text-faint); font-size: 0.72rem; margin-top: 2rem; letter-spacing: 0.3px; }
     </style>
     <script>
@@ -275,7 +302,7 @@
         <div class="section">
             <div class="plate-card">
                 <div class="label">License Plate</div>
-                <div class="value {% if not fields.license_plate %}empty{% endif %}">
+                <div class="value {% if not fields.license_plate %}empty{% endif %}" data-field="license_plate">
                     {{ fields.license_plate or 'Not detected' }}
                 </div>
             </div>
@@ -287,32 +314,32 @@
             <div class="field-grid">
                 <div class="field-row">
                     <div class="label">Make</div>
-                    <div class="value {% if not fields.vehicle_make %}empty{% endif %}">
+                    <div class="value {% if not fields.vehicle_make %}empty{% endif %}" data-field="vehicle_make">
                         {{ fields.vehicle_make or '—' }}
                     </div>
                 </div>
                 <div class="field-row">
                     <div class="label">Model</div>
-                    <div class="value {% if not fields.vehicle_model %}empty{% endif %}">
+                    <div class="value {% if not fields.vehicle_model %}empty{% endif %}" data-field="vehicle_model">
                         {{ fields.vehicle_model or '—' }}
                     </div>
                 </div>
                 <div class="field-row">
                     <div class="label">Type</div>
-                    <div class="value {% if not fields.vehicle_type %}empty{% endif %}">
+                    <div class="value {% if not fields.vehicle_type %}empty{% endif %}" data-field="vehicle_type">
                         {{ fields.vehicle_type or '—' }}
                     </div>
                 </div>
                 <div class="field-row">
                     <div class="label">Color</div>
-                    <div class="value {% if not fields.color %}empty{% endif %}">
+                    <div class="value {% if not fields.color %}empty{% endif %}" data-field="color">
                         {{ fields.color or '—' }}
                     </div>
                 </div>
             </div>
             <div class="field-row" style="margin-top:0.5rem">
                 <div class="label">VIN</div>
-                <div class="value {% if not fields.vin %}empty{% endif %}" style="font-size:0.8rem;letter-spacing:0.5px">
+                <div class="value {% if not fields.vin %}empty{% endif %}" data-field="vin" style="font-size:0.8rem;letter-spacing:0.5px">
                     {{ fields.vin or 'Not detected' }}
                 </div>
             </div>
@@ -323,13 +350,13 @@
             <div class="section-title">Owner</div>
             <div class="field-row">
                 <div class="label">Name</div>
-                <div class="value {% if not fields.owner_name %}empty{% endif %}">
+                <div class="value {% if not fields.owner_name %}empty{% endif %}" data-field="owner_name">
                     {{ fields.owner_name or 'Not detected' }}
                 </div>
             </div>
             <div class="field-row">
                 <div class="label">Address</div>
-                <div class="value {% if not fields.owner_address %}empty{% endif %}" style="font-size:0.78rem">
+                <div class="value {% if not fields.owner_address %}empty{% endif %}" data-field="owner_address" style="font-size:0.78rem">
                     {{ fields.owner_address or 'Not detected' }}
                 </div>
             </div>
@@ -341,13 +368,13 @@
             <div class="field-grid">
                 <div class="field-row">
                     <div class="label">Reg. Date</div>
-                    <div class="value {% if not fields.registration_date %}empty{% endif %}">
+                    <div class="value {% if not fields.registration_date %}empty{% endif %}" data-field="registration_date">
                         {{ fields.registration_date or '—' }}
                     </div>
                 </div>
                 <div class="field-row">
                     <div class="label">First Reg.</div>
-                    <div class="value {% if not fields.first_registration_date %}empty{% endif %}">
+                    <div class="value {% if not fields.first_registration_date %}empty{% endif %}" data-field="first_registration_date">
                         {{ fields.first_registration_date or '—' }}
                     </div>
                 </div>
@@ -360,13 +387,13 @@
             <div class="field-grid">
                 <div class="field-row">
                     <div class="label">Engine</div>
-                    <div class="value {% if not fields.engine_capacity_cc %}empty{% endif %}">
+                    <div class="value {% if not fields.engine_capacity_cc %}empty{% endif %}" data-field="engine_capacity_cc">
                         {{ (fields.engine_capacity_cc ~ ' cc') if fields.engine_capacity_cc else '—' }}
                     </div>
                 </div>
                 <div class="field-row">
                     <div class="label">Power</div>
-                    <div class="value {% if not fields.engine_power_kw %}empty{% endif %}">
+                    <div class="value {% if not fields.engine_power_kw %}empty{% endif %}" data-field="engine_power_kw">
                         {% if fields.engine_power_kw %}
                             {{ fields.engine_power_kw }} kW{% if fields.engine_power_hp %} / {{ fields.engine_power_hp }} HP{% endif %}
                         {% else %}
@@ -376,25 +403,25 @@
                 </div>
                 <div class="field-row">
                     <div class="label">Fuel</div>
-                    <div class="value {% if not fields.fuel_type %}empty{% endif %}">
+                    <div class="value {% if not fields.fuel_type %}empty{% endif %}" data-field="fuel_type">
                         {{ fields.fuel_type or '—' }}
                     </div>
                 </div>
                 <div class="field-row">
                     <div class="label">Seats</div>
-                    <div class="value {% if not fields.num_seats %}empty{% endif %}">
+                    <div class="value {% if not fields.num_seats %}empty{% endif %}" data-field="num_seats">
                         {{ fields.num_seats or '—' }}
                     </div>
                 </div>
                 <div class="field-row">
                     <div class="label">Max Weight</div>
-                    <div class="value {% if not fields.max_weight_kg %}empty{% endif %}">
+                    <div class="value {% if not fields.max_weight_kg %}empty{% endif %}" data-field="max_weight_kg">
                         {{ (fields.max_weight_kg ~ ' kg') if fields.max_weight_kg else '—' }}
                     </div>
                 </div>
                 <div class="field-row">
                     <div class="label">CO2</div>
-                    <div class="value {% if not fields.co2_emissions %}empty{% endif %}">
+                    <div class="value {% if not fields.co2_emissions %}empty{% endif %}" data-field="co2_emissions">
                         {{ fields.co2_emissions or '—' }}
                     </div>
                 </div>
@@ -417,6 +444,23 @@
             <div class="raw-content" id="rawContent">
                 <pre>{{ fields.raw_text }}</pre>
             </div>
+        </div>
+
+        <!-- Edit bar -->
+        <div class="edit-bar visible" id="editBar">
+            <button type="button" class="btn-edit btn-edit-toggle" id="editBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:15px;height:15px">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/>
+                </svg>
+                Edit Fields
+            </button>
+            <button type="button" class="btn-edit btn-edit-save" id="saveBtn" style="display:none">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:15px;height:15px">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                </svg>
+                Save Changes
+            </button>
+            <button type="button" class="btn-edit btn-edit-cancel" id="cancelBtn" style="display:none" title="Cancel">&times;</button>
         </div>
 
         <!-- Actions -->
@@ -485,6 +529,60 @@
                 label.textContent = 'Copied!';
                 setTimeout(() => label.textContent = 'Copy', 1500);
             });
+        });
+
+        /* ══════════ EDIT MODE ══════════ */
+        const EXPORT_ID  = '{{ export_id }}';
+        const editBtn    = document.getElementById('editBtn');
+        const saveBtn    = document.getElementById('saveBtn');
+        const cancelBtn  = document.getElementById('cancelBtn');
+        let originals    = {};
+
+        function allFields() { return document.querySelectorAll('[data-field]'); }
+
+        editBtn.addEventListener('click', () => {
+            allFields().forEach(el => {
+                originals[el.dataset.field] = el.textContent.trim();
+                el.contentEditable = 'true';
+                el.classList.remove('empty');
+            });
+            editBtn.style.display = 'none';
+            saveBtn.style.display = 'flex';
+            cancelBtn.style.display = 'flex';
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            allFields().forEach(el => {
+                el.contentEditable = 'false';
+                el.textContent = originals[el.dataset.field] ?? el.textContent;
+            });
+            editBtn.style.display = 'flex';
+            saveBtn.style.display = 'none';
+            cancelBtn.style.display = 'none';
+        });
+
+        saveBtn.addEventListener('click', async () => {
+            saveBtn.textContent = 'Saving…';
+            saveBtn.disabled = true;
+            const empties = new Set(['\u2014', '&mdash;', 'Not detected', '\u2013', '-']);
+            const updated = {};
+            allFields().forEach(el => {
+                el.contentEditable = 'false';
+                const val = el.textContent.trim();
+                updated[el.dataset.field] = empties.has(val) ? '' : val;
+            });
+            editBtn.style.display = 'flex';
+            saveBtn.style.display = 'none';
+            cancelBtn.style.display = 'none';
+            try {
+                const res = await fetch('/update/' + EXPORT_ID, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updated)
+                });
+                if (res.ok) { window.location.reload(); }
+                else { alert('Save failed. Please try again.'); saveBtn.disabled = false; }
+            } catch (e) { alert('Network error. Please try again.'); saveBtn.disabled = false; }
         });
     </script>
 </body>

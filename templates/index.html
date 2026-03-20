@@ -353,6 +353,28 @@
             letter-spacing: 0.3px;
         }
 
+        /* ── Camera button ── */
+        .btn-camera {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-top: 0.9rem;
+            padding: 0.55rem 1.1rem;
+            border: 1.5px solid var(--border);
+            border-radius: 999px;
+            background: transparent;
+            color: var(--text-muted);
+            font-family: inherit;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            position: relative;
+            z-index: 1;
+        }
+        .btn-camera:hover { border-color: var(--accent); color: var(--text); }
+        .btn-camera svg { width: 15px; height: 15px; }
+
         /* ════════════════════════════════
            SETTINGS DRAWER
         ════════════════════════════════ */
@@ -620,6 +642,11 @@
                     <div style="font-size:0.72rem; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; color:var(--text-faint);">Changelog</div>
 
                     <div style="display:flex; gap:0.6rem; align-items:flex-start;">
+                        <span style="font-size:0.7rem; font-family:'SF Mono','Fira Code',monospace; font-weight:700; color:var(--text-muted); background:var(--bg-inset); padding:0.15rem 0.45rem; border-radius:6px; flex-shrink:0;">v5</span>
+                        <span style="font-size:0.78rem; color:var(--text-muted); line-height:1.4;">Editable fields on result page, Take Photo camera button for mobile</span>
+                    </div>
+
+                    <div style="display:flex; gap:0.6rem; align-items:flex-start;">
                         <span style="font-size:0.7rem; font-family:'SF Mono','Fira Code',monospace; font-weight:700; color:var(--text-muted); background:var(--bg-inset); padding:0.15rem 0.45rem; border-radius:6px; flex-shrink:0;">v4</span>
                         <span style="font-size:0.78rem; color:var(--text-muted); line-height:1.4;">OliScan rebrand &amp; olive logo, settings drawer, dark / light mode, fixed button layout on mobile, 1-worker deploy fix</span>
                     </div>
@@ -680,6 +707,17 @@
                 <h3>Drop images here</h3>
                 <p>or tap to browse — up to {{ max_files }} files (JPG, PNG, TIFF, BMP)</p>
                 <input type="file" name="files" id="fileInput" accept=".png,.jpg,.jpeg,.bmp,.tiff,.tif,.webp" multiple>
+            </div>
+            <!-- Camera capture — opens rear camera directly on mobile -->
+            <div style="text-align:center; margin-top:-0.75rem; margin-bottom:1.25rem;">
+                <button type="button" class="btn-camera" id="cameraBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"/>
+                    </svg>
+                    Take Photo
+                </button>
+                <input type="file" name="files" id="cameraInput" accept="image/*" capture="environment" style="display:none" multiple>
             </div>
 
             <div class="file-preview" id="filePreview">
@@ -847,6 +885,7 @@
 
         function clear() {
             fileInput.value = '';
+            if (cameraInput) cameraInput.value = '';
             filePreview.classList.remove('active');
             dropZone.style.display = 'block';
             submitBtn.disabled = true;
@@ -857,6 +896,12 @@
 
         fileInput.addEventListener('change', () => { if (fileInput.files.length) show(fileInput.files); });
         removeFile.addEventListener('click', clear);
+
+        /* Camera capture button */
+        const cameraBtn = document.getElementById('cameraBtn');
+        const cameraInput = document.getElementById('cameraInput');
+        cameraBtn.addEventListener('click', () => cameraInput.click());
+        cameraInput.addEventListener('change', () => { if (cameraInput.files.length) show(cameraInput.files); });
 
         ['dragenter','dragover'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('dragover'); }));
         ['dragleave','drop'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.remove('dragover'); }));

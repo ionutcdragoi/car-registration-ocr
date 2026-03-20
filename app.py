@@ -26,7 +26,7 @@ app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", os.urandom(32).hex())
 
 # ── Version ────────────────────────────────────────────────
-APP_VERSION = "4.0.0"
+APP_VERSION = "5.0.0"
 
 # ── Configuration ──────────────────────────────────────────
 UPLOAD_FOLDER = Path(__file__).parent / "uploads"
@@ -173,6 +173,32 @@ def request_entity_too_large(error):
         return jsonify({"error": "File(s) too large. Maximum total is 64 MB."}), 413
     flash("File(s) too large. Maximum total upload size is 64 MB.", "error")
     return redirect(url_for("index"))
+
+
+@app.route("/update/<export_id>", methods=["POST"])
+def update_result(export_id: str):
+    """Allow client to save edited field values back into the export cache."""
+    payload = _cache_get(export_id)
+    if not payload:
+        return jsonify({"error": "Not found or expired"}), 404
+    updated = request.get_json(force=True, silent=True)
+    if not updated:
+        return jsonify({"error": "No data"}), 400
+    allowed_keys = {
+        "license_plate", "owner_name", "owner_address", "vehicle_make",
+        "vehicle_model", "vehicle_type", "vin", "registration_date",
+        "first_registration_date", "engine_capacity_cc", "engine_power_kw",
+        "engine_power_hp", "fuel_type", "color", "num_seats",
+        "max_weight_kg", "co2_emissions", "mileage",
+    }
+    # Single-result payload stores fields directly; batch stores under results[]
+    if payload.get("results"):
+        for item in payload["results"]:
+            for k, v in updated.items():
+                if k in allowed_keys:
+                    item["fields"][k] = v.strip() if v else ""
+    _cache_put(export_id, payload)
+    return jsonify({"ok": True})
 
 
 @app.route("/health")
