@@ -3,26 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Result &mdash; Car Registration OCR</title>
+    <title>Result &mdash; OliScan</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-page:#f5f5f5; --bg-card:#ffffff; --bg-subtle:#fafafa; --bg-inset:#f0f0f0;
+            --border:#e8e8e8; --text:#111111; --text-muted:#999999; --text-faint:#bbbbbb;
+            --accent:#111111; --accent-inv:#ffffff; --shadow:rgba(0,0,0,0.06);
+            --tag-bg:#111111; --tag-fg:#ffffff;
+            --flash-ok-bg:#f0fdf4; --flash-ok-fg:#15803d; --flash-ok-link:#111111;
+        }
+        html.dark {
+            --bg-page:#0f0f0f; --bg-card:#1a1a1a; --bg-subtle:#222222; --bg-inset:#2a2a2a;
+            --border:#333333; --text:#f0f0f0; --text-muted:#888888; --text-faint:#555555;
+            --accent:#f0f0f0; --accent-inv:#111111; --shadow:rgba(0,0,0,0.4);
+            --tag-bg:#f0f0f0; --tag-fg:#111111;
+            --flash-ok-bg:#0d2718; --flash-ok-fg:#4ade80; --flash-ok-link:#a7f3d0;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #f5f5f5;
-            color: #111;
+            background: var(--bg-page);
+            color: var(--text);
             min-height: 100vh;
+            transition: background 0.25s, color 0.25s;
         }
 
         .app {
             width: 100%;
             max-width: 440px;
             margin: 0 auto;
-            background: #fff;
+            background: var(--bg-card);
             min-height: 100vh;
             padding: 2rem 1.5rem 3rem;
+            transition: background 0.25s;
         }
 
         @media (min-width: 500px) {
@@ -30,18 +47,17 @@
                 min-height: auto;
                 margin: 2rem auto;
                 border-radius: 24px;
-                box-shadow: 0 4px 60px rgba(0,0,0,0.06);
+                box-shadow: 0 4px 60px var(--shadow);
                 padding: 2.5rem 2rem 3rem;
             }
         }
 
-        /* Header */
         .header { margin-bottom: 2rem; }
 
         .header-tag {
             display: inline-block;
-            background: #111;
-            color: #fff;
+            background: var(--tag-bg);
+            color: var(--tag-fg);
             font-size: 0.65rem;
             font-weight: 600;
             letter-spacing: 1.2px;
@@ -59,15 +75,11 @@
             margin-bottom: 0.4rem;
         }
 
-        .header .filename {
-            color: #bbb;
-            font-size: 0.8rem;
-        }
+        .header .filename { color: var(--text-faint); font-size: 0.8rem; }
 
-        /* Sheets banner */
         .sheets-banner {
-            background: #f0fdf4;
-            color: #15803d;
+            background: var(--flash-ok-bg);
+            color: var(--flash-ok-fg);
             padding: 0.75rem 1rem;
             border-radius: 14px;
             font-size: 0.82rem;
@@ -77,44 +89,37 @@
             align-items: center;
             gap: 0.5rem;
         }
-        .sheets-banner a { color: #111; font-weight: 600; text-decoration: underline; }
+        .sheets-banner a { color: var(--flash-ok-link); font-weight: 600; text-decoration: underline; }
 
-        /* Section */
-        .section {
-            margin-bottom: 1.75rem;
-        }
+        .section { margin-bottom: 1.75rem; }
 
         .section-title {
             font-size: 0.7rem;
             font-weight: 600;
             letter-spacing: 1px;
             text-transform: uppercase;
-            color: #bbb;
+            color: var(--text-faint);
             margin-bottom: 0.85rem;
             padding-left: 0.15rem;
         }
 
-        /* Field rows */
         .field-row {
             display: flex;
             align-items: center;
             padding: 0.85rem 1rem;
-            background: #fafafa;
+            background: var(--bg-subtle);
             border-radius: 14px;
             margin-bottom: 0.5rem;
             transition: background 0.15s;
         }
-
-        .field-row:hover { background: #f0f0f0; }
-
+        .field-row:hover { background: var(--bg-inset); }
         .field-row .label {
             font-size: 0.78rem;
-            color: #999;
+            color: var(--text-muted);
             font-weight: 500;
             min-width: 120px;
             flex-shrink: 0;
         }
-
         .field-row .value {
             font-size: 0.88rem;
             font-weight: 600;
@@ -122,18 +127,16 @@
             text-align: right;
             word-break: break-all;
         }
-
         .field-row .value.empty {
-            color: #ddd;
+            color: var(--text-faint);
             font-weight: 400;
             font-style: italic;
             font-size: 0.82rem;
         }
 
-        /* Highlight card for plate */
         .plate-card {
-            background: #111;
-            color: #fff;
+            background: var(--accent);
+            color: var(--accent-inv);
             border-radius: 16px;
             padding: 1.25rem 1.25rem;
             margin-bottom: 0.5rem;
@@ -141,64 +144,50 @@
             align-items: center;
             justify-content: space-between;
         }
-
         .plate-card .label {
             font-size: 0.72rem;
-            color: rgba(255,255,255,0.5);
+            color: rgba(127,127,127,0.6);
             font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-
         .plate-card .value {
             font-size: 1.4rem;
             font-weight: 700;
             letter-spacing: 1px;
         }
-
         .plate-card .value.empty {
-            color: rgba(255,255,255,0.3);
+            color: rgba(127,127,127,0.4);
             font-weight: 400;
             font-size: 0.9rem;
             font-style: italic;
             letter-spacing: 0;
         }
 
-        /* Two-col grid for compact fields */
         .field-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 0.5rem;
         }
-
         .field-grid .field-row {
             flex-direction: column;
             align-items: flex-start;
             gap: 0.25rem;
             padding: 0.75rem 1rem;
         }
+        .field-grid .field-row .label { min-width: auto; font-size: 0.7rem; }
+        .field-grid .field-row .value { text-align: left; font-size: 0.85rem; }
 
-        .field-grid .field-row .label {
-            min-width: auto;
-            font-size: 0.7rem;
-        }
-
-        .field-grid .field-row .value {
-            text-align: left;
-            font-size: 0.85rem;
-        }
-
-        /* Raw text */
         .raw-toggle {
             width: 100%;
-            background: #fafafa;
+            background: var(--bg-subtle);
             border: none;
             border-radius: 14px;
             padding: 0.85rem 1rem;
             font-family: inherit;
             font-size: 0.82rem;
             font-weight: 500;
-            color: #999;
+            color: var(--text-muted);
             cursor: pointer;
             text-align: left;
             transition: background 0.15s;
@@ -206,23 +195,11 @@
             align-items: center;
             justify-content: space-between;
         }
-
-        .raw-toggle:hover { background: #f0f0f0; }
-
-        .raw-toggle .chevron {
-            transition: transform 0.2s;
-            font-size: 0.7rem;
-        }
-
+        .raw-toggle:hover { background: var(--bg-inset); }
+        .raw-toggle .chevron { transition: transform 0.2s; font-size: 0.7rem; }
         .raw-toggle.open .chevron { transform: rotate(180deg); }
-
-        .raw-content {
-            display: none;
-            margin-top: 0.5rem;
-        }
-
+        .raw-content { display: none; margin-top: 0.5rem; }
         .raw-content.open { display: block; }
-
         .raw-content pre {
             background: #111;
             color: #aaa;
@@ -238,12 +215,7 @@
             line-height: 1.6;
         }
 
-        /* Actions */
-        .actions {
-            display: flex;
-            gap: 0.6rem;
-            margin-top: 2rem;
-        }
+        .actions { display: flex; gap: 0.6rem; margin-top: 2rem; }
 
         .btn {
             flex: 1;
@@ -262,35 +234,31 @@
             transition: all 0.15s;
             text-align: center;
         }
-
-        .btn-dark {
-            background: #111;
-            color: #fff;
-        }
-        .btn-dark:hover { background: #333; }
-
+        .btn-dark { background: var(--accent); color: var(--accent-inv); }
+        .btn-dark:hover { opacity: 0.82; }
         .btn-outline {
-            background: #fff;
-            color: #111;
-            border: 2px solid #e5e5e5;
+            background: var(--bg-card);
+            color: var(--text);
+            border: 2px solid var(--border);
         }
-        .btn-outline:hover { border-color: #ccc; background: #fafafa; }
-
+        .btn-outline:hover { border-color: var(--text-muted); background: var(--bg-subtle); }
         .btn svg { width: 16px; height: 16px; }
 
-        footer {
-            text-align: center;
-            color: #ddd;
-            font-size: 0.72rem;
-            margin-top: 2rem;
-            letter-spacing: 0.3px;
-        }
+        footer { text-align: center; color: var(--text-faint); font-size: 0.72rem; margin-top: 2rem; letter-spacing: 0.3px; }
     </style>
+    <script>
+        /* Apply dark mode immediately to avoid flash */
+        (function(){
+            let s; try { s = localStorage.getItem('oliscan-dark'); } catch(e){}
+            const sys = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (s !== null ? s === '1' : sys) document.documentElement.classList.add('dark');
+        })();
+    </script>
 </head>
 <body>
     <div class="app">
         <div class="header">
-            <span class="header-tag">Extraction Result</span>
+            <span class="header-tag">🫒 OliScan</span>
             <h1>{{ fields.vehicle_make or 'Vehicle' }}{% if fields.vehicle_model %} {{ fields.vehicle_model }}{% endif %}</h1>
             <div class="filename">{{ filename }}</div>
         </div>
@@ -487,7 +455,7 @@
             {% endif %}
         </div>
 
-        <footer>Powered by Tesseract &amp; Flask</footer>
+        <footer>🫒 OliScan &mdash; Powered by Tesseract &amp; Flask</footer>
     </div>
 
     <script>

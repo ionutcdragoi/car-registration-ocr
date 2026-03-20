@@ -3,28 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Car Registration OCR</title>
+    <title>OliScan</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* ── CSS variables for light / dark ── */
+        :root {
+            --bg-page:    #f5f5f5;
+            --bg-card:    #ffffff;
+            --bg-subtle:  #fafafa;
+            --bg-inset:   #f5f5f5;
+            --border:     #e8e8e8;
+            --border-alt: #f0f0f0;
+            --text:       #111111;
+            --text-muted: #888888;
+            --text-faint: #bbbbbb;
+            --accent:     #111111;
+            --accent-inv: #ffffff;
+            --shadow:     rgba(0,0,0,0.06);
+            --progress-bg:#efefef;
+            --tag-bg:     #111111;
+            --tag-fg:     #ffffff;
+            --drawer-bg:  #ffffff;
+            --overlay:    rgba(0,0,0,0.35);
+            --toggle-track:#e0e0e0;
+            --toggle-thumb:#ffffff;
+            --flash-err-bg:#fef2f2; --flash-err-fg:#b91c1c;
+            --flash-warn-bg:#fefce8; --flash-warn-fg:#a16207;
+            --flash-ok-bg:#f0fdf4;  --flash-ok-fg:#15803d;
+        }
+        html.dark {
+            --bg-page:    #0f0f0f;
+            --bg-card:    #1a1a1a;
+            --bg-subtle:  #222222;
+            --bg-inset:   #2a2a2a;
+            --border:     #333333;
+            --border-alt: #2a2a2a;
+            --text:       #f0f0f0;
+            --text-muted: #888888;
+            --text-faint: #555555;
+            --accent:     #f0f0f0;
+            --accent-inv: #111111;
+            --shadow:     rgba(0,0,0,0.4);
+            --progress-bg:#2a2a2a;
+            --tag-bg:     #f0f0f0;
+            --tag-fg:     #111111;
+            --drawer-bg:  #1a1a1a;
+            --overlay:    rgba(0,0,0,0.6);
+            --toggle-track:#4a9a6a;
+            --toggle-thumb:#ffffff;
+            --flash-err-bg:#2d1515; --flash-err-fg:#f87171;
+            --flash-warn-bg:#2d2810; --flash-warn-fg:#fbbf24;
+            --flash-ok-bg:#0d2718;  --flash-ok-fg:#4ade80;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #f5f5f5;
-            color: #111;
+            background: var(--bg-page);
+            color: var(--text);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: background 0.25s, color 0.25s;
         }
 
         .app {
             width: 100%;
             max-width: 440px;
             min-height: 100vh;
-            background: #fff;
+            background: var(--bg-card);
             padding: 2rem 1.5rem;
+            transition: background 0.25s;
+            position: relative;
         }
 
         @media (min-width: 500px) {
@@ -32,18 +85,28 @@
                 min-height: auto;
                 margin: 2rem auto;
                 border-radius: 24px;
-                box-shadow: 0 4px 60px rgba(0,0,0,0.06);
+                box-shadow: 0 4px 60px var(--shadow);
                 padding: 2.5rem 2rem;
             }
         }
 
-        /* Header */
-        .header { margin-bottom: 2.5rem; }
+        /* ── Header ── */
+        .header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 2.5rem;
+            gap: 1rem;
+        }
+
+        .header-left { flex: 1; }
 
         .header-tag {
-            display: inline-block;
-            background: #111;
-            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: var(--tag-bg);
+            color: var(--tag-fg);
             font-size: 0.65rem;
             font-weight: 600;
             letter-spacing: 1.2px;
@@ -52,6 +115,8 @@
             border-radius: 20px;
             margin-bottom: 1.25rem;
         }
+
+        .olive { font-size: 1rem; letter-spacing: 0; }
 
         .header h1 {
             font-size: 2rem;
@@ -62,12 +127,31 @@
         }
 
         .header p {
-            color: #999;
+            color: var(--text-muted);
             font-size: 0.88rem;
             line-height: 1.5;
         }
 
-        /* Flash messages */
+        /* Settings gear */
+        .btn-settings {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--bg-subtle);
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
+            margin-top: 0.1rem;
+        }
+        .btn-settings:hover { background: var(--bg-inset); color: var(--text); border-color: var(--text); }
+        .btn-settings svg { width: 18px; height: 18px; }
+
+        /* ── Flash messages ── */
         .flash {
             padding: 0.75rem 1rem;
             border-radius: 14px;
@@ -75,13 +159,13 @@
             font-size: 0.82rem;
             font-weight: 500;
         }
-        .flash.error { background: #fef2f2; color: #b91c1c; }
-        .flash.warning { background: #fefce8; color: #a16207; }
-        .flash.success { background: #f0fdf4; color: #15803d; }
+        .flash.error   { background: var(--flash-err-bg);  color: var(--flash-err-fg); }
+        .flash.warning { background: var(--flash-warn-bg); color: var(--flash-warn-fg); }
+        .flash.success { background: var(--flash-ok-bg);   color: var(--flash-ok-fg); }
 
-        /* Upload zone */
+        /* ── Upload zone ── */
         .upload-zone {
-            border: 2px dashed #e0e0e0;
+            border: 2px dashed var(--border);
             border-radius: 20px;
             padding: 3rem 1.5rem;
             text-align: center;
@@ -93,14 +177,14 @@
 
         .upload-zone:hover,
         .upload-zone.dragover {
-            border-color: #111;
-            background: #fafafa;
+            border-color: var(--accent);
+            background: var(--bg-subtle);
         }
 
         .upload-icon {
             width: 56px;
             height: 56px;
-            background: #f5f5f5;
+            background: var(--bg-inset);
             border-radius: 16px;
             display: flex;
             align-items: center;
@@ -109,9 +193,9 @@
             transition: background 0.2s;
         }
 
-        .upload-zone:hover .upload-icon { background: #eee; }
+        .upload-zone:hover .upload-icon { background: var(--border); }
 
-        .upload-icon svg { width: 24px; height: 24px; stroke: #888; }
+        .upload-icon svg { width: 24px; height: 24px; stroke: var(--text-muted); }
 
         .upload-zone h3 {
             font-size: 0.95rem;
@@ -119,7 +203,7 @@
             margin-bottom: 0.35rem;
         }
 
-        .upload-zone p { color: #bbb; font-size: 0.78rem; }
+        .upload-zone p { color: var(--text-faint); font-size: 0.78rem; }
 
         .upload-zone input[type="file"] {
             position: absolute;
@@ -128,14 +212,14 @@
             cursor: pointer;
         }
 
-        /* File preview */
+        /* ── File preview ── */
         .file-preview {
             display: none;
             flex-direction: column;
             align-items: stretch;
             gap: 0.75rem;
             padding: 1rem;
-            background: #fafafa;
+            background: var(--bg-subtle);
             border-radius: 16px;
             margin-bottom: 1.5rem;
         }
@@ -155,15 +239,8 @@
             gap: 0.2rem;
         }
 
-        .file-preview-meta .name {
-            font-weight: 700;
-            font-size: 0.84rem;
-        }
-
-        .file-preview-meta .size {
-            color: #b3b3b3;
-            font-size: 0.72rem;
-        }
+        .file-preview-meta .name { font-weight: 700; font-size: 0.84rem; }
+        .file-preview-meta .size { color: var(--text-faint); font-size: 0.72rem; }
 
         .file-list {
             display: flex;
@@ -180,28 +257,235 @@
             justify-content: space-between;
             gap: 1rem;
             padding: 0.7rem 0.85rem;
-            background: #fff;
+            background: var(--bg-card);
             border-radius: 12px;
-            border: 1px solid #efefef;
+            border: 1px solid var(--border-alt);
         }
 
-        .file-item-name {
+        .file-item-name { font-weight: 600; font-size: 0.82rem; word-break: break-all; }
+        .file-item-size { color: var(--text-faint); font-size: 0.72rem; }
+
+        .file-preview .remove {
+            background: none;
+            border: none;
+            color: var(--text-faint);
+            cursor: pointer;
+            font-size: 1.4rem;
+            padding: 0.5rem;
+            line-height: 1;
+            border-radius: 50%;
+            transition: all 0.15s;
+        }
+        .file-preview .remove:hover { background: var(--bg-inset); color: var(--text-muted); }
+
+        /* ── Submit button ── */
+        .btn-submit {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            width: 100%;
+            padding: 1rem;
+            background: var(--accent);
+            color: var(--accent-inv);
+            border: none;
+            border-radius: 16px;
+            font-family: inherit;
+            font-size: 0.92rem;
             font-weight: 600;
-            font-size: 0.82rem;
-            word-break: break-all;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-submit:hover { opacity: 0.82; }
+        .btn-submit:disabled { opacity: 0.3; cursor: not-allowed; }
+        .btn-submit svg { width: 18px; height: 18px; }
+
+        .spinner {
+            display: none;
+            width: 18px; height: 18px;
+            border: 2.5px solid rgba(255,255,255,0.3);
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Progress ── */
+        .progress-wrap {
+            display: none;
+            margin: 1rem 0 1.5rem;
+            gap: 0.6rem;
+            flex-direction: column;
+        }
+        .progress-wrap.active { display: flex; }
+
+        .progress-meta {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            font-weight: 600;
         }
 
-        .file-item-size,
-        .file-preview .info .size { color: #bbb; font-size: 0.72rem; }
-
-        .field-block {
-            margin-bottom: 1rem;
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: var(--progress-bg);
+            border-radius: 999px;
+            overflow: hidden;
         }
 
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--accent);
+            border-radius: 999px;
+            transition: width 0.18s linear;
+        }
+
+        /* ── Footer ── */
+        footer {
+            text-align: center;
+            color: var(--text-faint);
+            font-size: 0.72rem;
+            margin-top: 2.5rem;
+            letter-spacing: 0.3px;
+        }
+
+        /* ════════════════════════════════
+           SETTINGS DRAWER
+        ════════════════════════════════ */
+
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--overlay);
+            z-index: 100;
+            backdrop-filter: blur(2px);
+            transition: opacity 0.25s;
+            opacity: 0;
+        }
+        .overlay.open { display: block; }
+        .overlay.visible { opacity: 1; }
+
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100%;
+            width: min(360px, 92vw);
+            background: var(--drawer-bg);
+            box-shadow: -8px 0 40px var(--shadow);
+            z-index: 101;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.25s;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .drawer.open { transform: translateX(0); }
+
+        .drawer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem 1.5rem 0;
+            flex-shrink: 0;
+        }
+
+        .drawer-title {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .btn-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: var(--bg-inset);
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s, color 0.15s;
+        }
+        .btn-close:hover { background: var(--border); color: var(--text); }
+
+        .drawer-body {
+            padding: 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* ── Drawer section ── */
+        .drawer-section {
+            border: 1px solid var(--border-alt);
+            border-radius: 16px;
+            padding: 1.25rem;
+            background: var(--bg-subtle);
+        }
+
+        .drawer-section-label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 1.1rem;
+        }
+
+        /* ── Dark mode toggle row ── */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .toggle-label {
+            font-size: 0.88rem;
+            font-weight: 500;
+        }
+
+        .toggle-track {
+            position: relative;
+            width: 44px;
+            height: 26px;
+            border-radius: 999px;
+            background: var(--toggle-track);
+            cursor: pointer;
+            transition: background 0.25s;
+            flex-shrink: 0;
+        }
+
+        .toggle-track input { position: absolute; opacity: 0; width: 0; height: 0; }
+
+        .toggle-thumb {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--toggle-thumb);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+            transition: transform 0.25s;
+        }
+
+        .toggle-track input:checked ~ .toggle-thumb { transform: translateX(18px); }
+
+        /* ── Sheets fields inside drawer ── */
         .field-label {
             display: block;
             font-size: 0.74rem;
-            color: #888;
+            color: var(--text-muted);
             font-weight: 600;
             margin-bottom: 0.45rem;
             letter-spacing: 0.02em;
@@ -209,91 +493,58 @@
 
         .text-input {
             width: 100%;
-            border: 1px solid #e8e8e8;
+            border: 1px solid var(--border);
             border-radius: 14px;
-            padding: 0.95rem 1rem;
+            padding: 0.85rem 1rem;
             font: inherit;
             font-size: 0.85rem;
-            color: #111;
+            color: var(--text);
+            background: var(--bg-card);
             outline: none;
-            transition: border-color 0.15s, box-shadow 0.15s;
-            margin-bottom: 1.5rem;
+            transition: border-color 0.15s, box-shadow 0.15s, background 0.25s, color 0.25s;
+            margin-bottom: 1rem;
         }
 
         .text-input:focus {
-            border-color: #111;
-            box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.06);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(127,127,127,0.12);
         }
 
         .helper-text {
-            color: #b3b3b3;
+            color: var(--text-faint);
             font-size: 0.72rem;
             line-height: 1.45;
-            margin-top: -1rem;
-            margin-bottom: 1.5rem;
         }
 
-        .helper-text a {
-            color: #888;
-            text-decoration: underline;
-        }
-
-        .sheets-section {
-            border: 1px solid #f0f0f0;
-            border-radius: 16px;
-            padding: 1.25rem 1rem;
-            margin-bottom: 1.5rem;
-            background: #fafafa;
-        }
-
-        .section-label {
-            font-size: 0.82rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
+        .helper-text a { color: var(--text-muted); text-decoration: underline; }
 
         .optional-tag {
             font-size: 0.65rem;
             font-weight: 500;
-            color: #bbb;
-            background: #f0f0f0;
+            color: var(--text-faint);
+            background: var(--bg-inset);
             padding: 0.15rem 0.5rem;
             border-radius: 8px;
-        }
-
-        .sheets-section .text-input {
-            margin-bottom: 0.75rem;
-        }
-
-        .sheets-section .field-label {
-            margin-bottom: 0.35rem;
-        }
-
-        .sheets-section .helper-text {
-            margin-top: 0.25rem;
-            margin-bottom: 0;
+            margin-left: 0.35rem;
         }
 
         .creds-upload {
             position: relative;
-            border: 1px dashed #ddd;
+            border: 1px dashed var(--border);
             border-radius: 12px;
             padding: 0.75rem 1rem;
             text-align: center;
             cursor: pointer;
             transition: all 0.15s;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.85rem;
         }
 
-        .creds-upload:hover { border-color: #111; background: #fff; }
+        .creds-upload:hover { border-color: var(--accent); background: var(--bg-card); }
 
         .creds-upload.has-file {
             border-style: solid;
             border-color: #16a34a;
-            background: #f0fdf4;
+            background: var(--flash-ok-bg);
         }
 
         .creds-upload input[type="file"] {
@@ -303,125 +554,78 @@
             cursor: pointer;
         }
 
-        .creds-upload-text {
-            font-size: 0.78rem;
-            color: #999;
-        }
+        .creds-upload-text { font-size: 0.78rem; color: var(--text-muted); }
 
         .creds-upload.has-file .creds-upload-text {
             color: #16a34a;
             font-weight: 600;
         }
-
-        .file-preview .remove {
-            background: none;
-            border: none;
-            color: #bbb;
-            cursor: pointer;
-            font-size: 1.4rem;
-            padding: 0.5rem;
-            line-height: 1;
-            border-radius: 50%;
-            transition: all 0.15s;
-        }
-        .file-preview .remove:hover { background: #eee; color: #666; }
-
-        /* Button */
-        .btn-submit {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.6rem;
-            width: 100%;
-            padding: 1rem;
-            background: #111;
-            color: #fff;
-            border: none;
-            border-radius: 16px;
-            font-family: inherit;
-            font-size: 0.92rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-submit:hover { background: #333; }
-        .btn-submit:disabled { background: #e5e5e5; color: #bbb; cursor: not-allowed; }
-        .btn-submit svg { width: 18px; height: 18px; }
-
-        .spinner {
-            display: none;
-            width: 18px; height: 18px;
-            border: 2.5px solid rgba(255,255,255,0.3);
-            border-top-color: #fff;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* Status */
-        .status-pill {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 1.25rem;
-            padding: 0.65rem 1rem;
-            border-radius: 14px;
-            font-size: 0.78rem;
-            font-weight: 500;
-        }
-        .status-pill.ok { background: #f0fdf4; color: #16a34a; }
-        .status-pill.warn { background: #fafafa; color: #bbb; }
-        .status-pill svg { width: 14px; height: 14px; flex-shrink: 0; }
-
-        .progress-wrap {
-            display: none;
-            margin: 1rem 0 1.5rem;
-            gap: 0.6rem;
-            flex-direction: column;
-        }
-
-        .progress-wrap.active { display: flex; }
-
-        .progress-meta {
-            display: flex;
-            justify-content: space-between;
-            gap: 1rem;
-            font-size: 0.76rem;
-            color: #8f8f8f;
-            font-weight: 600;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 10px;
-            background: #efefef;
-            border-radius: 999px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            width: 0%;
-            height: 100%;
-            background: #111;
-            border-radius: 999px;
-            transition: width 0.18s linear;
-        }
-
-        footer {
-            text-align: center;
-            color: #ddd;
-            font-size: 0.72rem;
-            margin-top: 2.5rem;
-            letter-spacing: 0.3px;
-        }
     </style>
 </head>
 <body>
+    <!-- ══════════ SETTINGS OVERLAY + DRAWER ══════════ -->
+    <div class="overlay" id="overlay"></div>
+
+    <div class="drawer" id="drawer">
+        <div class="drawer-header">
+            <span class="drawer-title">Settings</span>
+            <button class="btn-close" id="drawerClose" aria-label="Close">&times;</button>
+        </div>
+        <div class="drawer-body">
+
+            <!-- Appearance -->
+            <div class="drawer-section">
+                <div class="drawer-section-label">Appearance</div>
+                <div class="toggle-row">
+                    <span class="toggle-label">Dark mode</span>
+                    <label class="toggle-track" aria-label="Toggle dark mode">
+                        <input type="checkbox" id="darkToggle">
+                        <span class="toggle-thumb"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Google Sheets -->
+            <div class="drawer-section">
+                <div class="drawer-section-label">Google Sheets export <span class="optional-tag">optional</span></div>
+
+                <label class="field-label" for="sheetUrl">Sheet URL</label>
+                <input
+                    class="text-input"
+                    type="url"
+                    name="sheet_url_drawer"
+                    id="sheetUrl"
+                    placeholder="https://docs.google.com/spreadsheets/d/..."
+                >
+
+                <label class="field-label" for="credsFile">Service Account Key (JSON)</label>
+                <div class="creds-upload" id="credsZone">
+                    <span class="creds-upload-text" id="credsText">Drop or choose .json key file</span>
+                    <input type="file" id="credsFile" accept=".json">
+                </div>
+
+                <div class="helper-text">
+                    Each user provides their own <a href="https://console.cloud.google.com/iam-admin/serviceaccounts" target="_blank">service account key</a>. Share the sheet with the service account email as Editor. Your key is used only for this request and never stored.
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- ══════════════════════════════════════════════ -->
+
     <div class="app">
         <div class="header">
-            <span class="header-tag">OCR Scanner</span>
-            <h1>Car Registration</h1>
-            <p>Upload a registration document photo to extract vehicle data automatically.</p>
+            <div class="header-left">
+                <div class="header-tag"><span class="olive">🫒</span> OliScan</div>
+                <h1>Car Registration</h1>
+                <p>Upload a registration document photo to extract vehicle data automatically.</p>
+            </div>
+            <button class="btn-settings" id="settingsBtn" aria-label="Settings">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                </svg>
+            </button>
         </div>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -430,7 +634,11 @@
             {% endfor %}
         {% endwith %}
 
+        <!-- Hidden fields populated by JS from drawer inputs -->
         <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="sheet_url" id="sheetUrlHidden">
+            <!-- credentials file injected via DataTransfer -->
+
             <div class="upload-zone" id="dropZone">
                 <div class="upload-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -453,28 +661,8 @@
                 <div class="file-list" id="fileList"></div>
             </div>
 
-            <div class="sheets-section">
-                <div class="section-label">Google Sheets export <span class="optional-tag">optional</span></div>
-
-                <label class="field-label" for="sheetUrl">Sheet URL</label>
-                <input
-                    class="text-input"
-                    type="url"
-                    name="sheet_url"
-                    id="sheetUrl"
-                    placeholder="https://docs.google.com/spreadsheets/d/..."
-                >
-
-                <label class="field-label" for="credsFile">Service Account Key (JSON)</label>
-                <div class="creds-upload" id="credsZone">
-                    <span class="creds-upload-text" id="credsText">Drop or choose .json key file</span>
-                    <input type="file" name="credentials" id="credsFile" accept=".json">
-                </div>
-
-                <div class="helper-text">
-                    Each user provides their own <a href="https://console.cloud.google.com/iam-admin/serviceaccounts" target="_blank">service account key</a>. Share the sheet with the service account email as Editor. Your key is used only for this request and never stored.
-                </div>
-            </div>
+            <!-- Hidden credentials file input used on form submission -->
+            <input type="file" name="credentials" id="credsFileHidden" accept=".json" style="display:none">
 
             <div class="progress-wrap" id="progressWrap">
                 <div class="progress-meta">
@@ -495,44 +683,99 @@
             </button>
         </form>
 
-
-
-        <footer>Powered by Tesseract &amp; Flask</footer>
+        <footer>🫒 OliScan &mdash; Powered by Tesseract &amp; Flask</footer>
     </div>
 
     <script>
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('fileInput');
-        const filePreview = document.getElementById('filePreview');
-        const fnEl = document.getElementById('fileName');
-        const fsEl = document.getElementById('fileSize');
-        const fileListEl = document.getElementById('fileList');
-        const removeFile = document.getElementById('removeFile');
-        const submitBtn = document.getElementById('submitBtn');
-        const spinner = document.getElementById('spinner');
-        const btnText = document.getElementById('btnText');
-        const btnIcon = document.getElementById('btnIcon');
-        const form = document.getElementById('uploadForm');
-        const progressWrap = document.getElementById('progressWrap');
-        const progressFill = document.getElementById('progressFill');
-        const progressPercent = document.getElementById('progressPercent');
-        const progressLabel = document.getElementById('progressLabel');
-        const credsFile = document.getElementById('credsFile');
-        const credsZone = document.getElementById('credsZone');
-        const credsText = document.getElementById('credsText');
+        /* ══════════ DARK MODE ══════════ */
+        const htmlEl = document.documentElement;
+        const darkToggle = document.getElementById('darkToggle');
 
-        /* Credential file selection feedback */
+        function applyDark(on) {
+            htmlEl.classList.toggle('dark', on);
+            darkToggle.checked = on;
+            try { localStorage.setItem('oliscan-dark', on ? '1' : '0'); } catch(e){}
+        }
+
+        // Init from storage or system preference
+        (function() {
+            let saved;
+            try { saved = localStorage.getItem('oliscan-dark'); } catch(e){}
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            applyDark(saved !== null ? saved === '1' : prefersDark);
+        })();
+
+        darkToggle.addEventListener('change', () => applyDark(darkToggle.checked));
+
+        /* ══════════ SETTINGS DRAWER ══════════ */
+        const settingsBtn = document.getElementById('settingsBtn');
+        const drawer      = document.getElementById('drawer');
+        const overlay     = document.getElementById('overlay');
+        const drawerClose = document.getElementById('drawerClose');
+
+        function openDrawer() {
+            overlay.classList.add('open');
+            requestAnimationFrame(() => overlay.classList.add('visible'));
+            drawer.classList.add('open');
+        }
+
+        function closeDrawer() {
+            overlay.classList.remove('visible');
+            drawer.classList.remove('open');
+            setTimeout(() => overlay.classList.remove('open'), 280);
+        }
+
+        settingsBtn.addEventListener('click', openDrawer);
+        drawerClose.addEventListener('click', closeDrawer);
+        overlay.addEventListener('click', closeDrawer);
+
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+
+        /* ══════════ CREDENTIALS PICKER (in drawer) ══════════ */
+        const credsFile   = document.getElementById('credsFile');
+        const credsZone   = document.getElementById('credsZone');
+        const credsText   = document.getElementById('credsText');
+        const credsHidden = document.getElementById('credsFileHidden');
+
         if (credsFile) {
             credsFile.addEventListener('change', () => {
                 if (credsFile.files.length) {
                     credsZone.classList.add('has-file');
                     credsText.textContent = '\u2713 ' + credsFile.files[0].name;
+                    // Mirror into the hidden form input via DataTransfer
+                    try {
+                        const dt = new DataTransfer();
+                        dt.items.add(credsFile.files[0]);
+                        credsHidden.files = dt.files;
+                    } catch(e) {}
                 } else {
                     credsZone.classList.remove('has-file');
                     credsText.textContent = 'Drop or choose .json key file';
                 }
             });
         }
+
+        /* Mirror sheet URL into the hidden form field before submit */
+        const sheetUrlDrawer = document.getElementById('sheetUrl');
+        const sheetUrlHidden = document.getElementById('sheetUrlHidden');
+
+        /* ══════════ UPLOAD FORM ══════════ */
+        const dropZone      = document.getElementById('dropZone');
+        const fileInput     = document.getElementById('fileInput');
+        const filePreview   = document.getElementById('filePreview');
+        const fnEl          = document.getElementById('fileName');
+        const fsEl          = document.getElementById('fileSize');
+        const fileListEl    = document.getElementById('fileList');
+        const removeFile    = document.getElementById('removeFile');
+        const submitBtn     = document.getElementById('submitBtn');
+        const spinner       = document.getElementById('spinner');
+        const btnText       = document.getElementById('btnText');
+        const btnIcon       = document.getElementById('btnIcon');
+        const form          = document.getElementById('uploadForm');
+        const progressWrap  = document.getElementById('progressWrap');
+        const progressFill  = document.getElementById('progressFill');
+        const progressPercent = document.getElementById('progressPercent');
+        const progressLabel = document.getElementById('progressLabel');
 
         const fmt = b => b < 1024 ? b+' B' : b < 1048576 ? (b/1024).toFixed(1)+' KB' : (b/1048576).toFixed(1)+' MB';
         const MAX_FILES = {{ max_files }};
@@ -577,10 +820,7 @@
             submitBtn.disabled = true;
             progressWrap.classList.remove('active');
             setProgress(0, 'Uploading files…');
-            if (processingTimer) {
-                clearInterval(processingTimer);
-                processingTimer = null;
-            }
+            if (processingTimer) { clearInterval(processingTimer); processingTimer = null; }
         }
 
         fileInput.addEventListener('change', () => { if (fileInput.files.length) show(fileInput.files); });
@@ -596,6 +836,9 @@
         form.addEventListener('submit', e => {
             e.preventDefault();
             if (!fileInput.files.length) return;
+
+            // Sync drawer values into hidden form fields
+            sheetUrlHidden.value = sheetUrlDrawer ? sheetUrlDrawer.value.trim() : '';
 
             submitBtn.disabled = true;
             spinner.style.display = 'inline-block';
@@ -620,9 +863,7 @@
                 setProgress(42, 'Analyzing images…');
                 const ceiling = 96;
                 const fileCount = fileInput.files.length;
-                /* Estimate ~15 s per file; curve speed adapts to file count */
                 const estimatedMs = fileCount * 15000;
-                /* tick every 150 ms for silky-smooth movement */
                 const tick = 150;
                 const startTime = Date.now();
 
@@ -635,11 +876,9 @@
 
                 processingTimer = setInterval(() => {
                     const elapsed = Date.now() - startTime;
-                    /* asymptotic ease-out: approaches ceiling but never reaches it */
                     const ratio = 1 - Math.exp(-2.8 * elapsed / estimatedMs);
                     const value = 42 + (ceiling - 42) * ratio;
 
-                    /* pick contextual label */
                     let lbl = null;
                     for (let i = labels.length - 1; i >= 0; i--) {
                         if (value >= labels[i][0]) { lbl = labels[i][1]; break; }
@@ -656,19 +895,14 @@
             /* ---- Response ---- */
             xhr.onreadystatechange = () => {
                 if (xhr.readyState !== XMLHttpRequest.DONE) return;
-                if (processingTimer) {
-                    clearInterval(processingTimer);
-                    processingTimer = null;
-                }
+                if (processingTimer) { clearInterval(processingTimer); processingTimer = null; }
 
                 if (xhr.status >= 200 && xhr.status < 300) {
-                    /* smooth finish: animate from wherever we are to 100 % */
                     const from = currentProgress;
                     const dur = 400;
                     const t0 = Date.now();
                     function finish() {
                         const t = Math.min((Date.now() - t0) / dur, 1);
-                        /* ease-out-quad */
                         const ease = 1 - (1 - t) * (1 - t);
                         setProgress(from + (100 - from) * ease, 'Done!');
                         if (t < 1) {

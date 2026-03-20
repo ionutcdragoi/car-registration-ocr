@@ -3,39 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Batch Result — Car Registration OCR</title>
+    <title>Batch Result — OliScan</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-page:#f5f5f5; --bg-card:#ffffff; --bg-subtle:#fafafa; --bg-inset:#f0f0f0;
+            --border:#efefef; --border-alt:#f0f0f0; --text:#111111; --text-muted:#9a9a9a;
+            --text-faint:#bbbbbb; --accent:#111111; --accent-inv:#ffffff;
+            --shadow:rgba(0,0,0,0.06); --tag-bg:#111111; --tag-fg:#ffffff;
+            --flash-ok-bg:#f0fdf4; --flash-ok-fg:#15803d; --flash-ok-link:#111111;
+        }
+        html.dark {
+            --bg-page:#0f0f0f; --bg-card:#1a1a1a; --bg-subtle:#222222; --bg-inset:#2a2a2a;
+            --border:#2a2a2a; --border-alt:#2a2a2a; --text:#f0f0f0; --text-muted:#888888;
+            --text-faint:#555555; --accent:#f0f0f0; --accent-inv:#111111;
+            --shadow:rgba(0,0,0,0.4); --tag-bg:#f0f0f0; --tag-fg:#111111;
+            --flash-ok-bg:#0d2718; --flash-ok-fg:#4ade80; --flash-ok-link:#a7f3d0;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #f5f5f5;
-            color: #111;
+            background: var(--bg-page);
+            color: var(--text);
             min-height: 100vh;
+            transition: background 0.25s, color 0.25s;
         }
         .app {
             width: 100%;
             max-width: 880px;
             margin: 0 auto;
-            background: #fff;
+            background: var(--bg-card);
             min-height: 100vh;
             padding: 2rem 1.5rem 3rem;
+            transition: background 0.25s;
         }
         @media (min-width: 900px) {
             .app {
                 min-height: auto;
                 margin: 2rem auto;
                 border-radius: 24px;
-                box-shadow: 0 4px 60px rgba(0,0,0,0.06);
+                box-shadow: 0 4px 60px var(--shadow);
                 padding: 2.5rem 2rem 3rem;
             }
         }
         .header { margin-bottom: 1.5rem; }
         .header-tag {
             display: inline-block;
-            background: #111;
-            color: #fff;
+            background: var(--tag-bg);
+            color: var(--tag-fg);
             font-size: 0.65rem;
             font-weight: 600;
             letter-spacing: 1.2px;
@@ -51,61 +68,46 @@
             line-height: 1.15;
             margin-bottom: 0.35rem;
         }
-        .header p {
-            color: #9a9a9a;
-            font-size: 0.86rem;
-            line-height: 1.45;
-        }
+        .header p { color: var(--text-muted); font-size: 0.86rem; line-height: 1.45; }
         .summary-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 0.75rem;
             margin: 1.5rem 0 2rem;
         }
-        .summary-card {
-            background: #fafafa;
-            border-radius: 16px;
-            padding: 1rem;
-        }
+        .summary-card { background: var(--bg-subtle); border-radius: 16px; padding: 1rem; }
         .summary-card .label {
-            color: #9f9f9f;
+            color: var(--text-muted);
             font-size: 0.72rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             margin-bottom: 0.35rem;
         }
-        .summary-card .value {
-            font-size: 1.3rem;
-            font-weight: 700;
-        }
+        .summary-card .value { font-size: 1.3rem; font-weight: 700; }
         .banner {
-            background: #f0fdf4;
-            color: #15803d;
+            background: var(--flash-ok-bg);
+            color: var(--flash-ok-fg);
             padding: 0.9rem 1rem;
             border-radius: 14px;
             font-size: 0.82rem;
             font-weight: 500;
             margin-bottom: 1.5rem;
         }
-        .banner a { color: #111; font-weight: 700; }
+        .banner a { color: var(--flash-ok-link); font-weight: 700; }
         .section-title {
             font-size: 0.72rem;
             font-weight: 600;
             letter-spacing: 1px;
             text-transform: uppercase;
-            color: #bbb;
+            color: var(--text-faint);
             margin-bottom: 0.9rem;
         }
-        .result-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.9rem;
-        }
+        .result-list { display: flex; flex-direction: column; gap: 0.9rem; }
         .result-card {
-            background: #fafafa;
+            background: var(--bg-subtle);
             border-radius: 18px;
             overflow: hidden;
-            border: 1px solid #efefef;
+            border: 1px solid var(--border);
         }
         .result-head {
             display: flex;
@@ -114,24 +116,17 @@
             align-items: center;
             padding: 1rem 1rem 0.9rem;
         }
-        .result-head h2 {
-            font-size: 0.95rem;
-            font-weight: 700;
-            word-break: break-word;
-        }
+        .result-head h2 { font-size: 0.95rem; font-weight: 700; word-break: break-word; }
         .plate-pill {
-            background: #111;
-            color: #fff;
+            background: var(--accent);
+            color: var(--accent-inv);
             border-radius: 999px;
             padding: 0.45rem 0.8rem;
             font-size: 0.75rem;
             font-weight: 700;
             white-space: nowrap;
         }
-        .plate-pill.empty {
-            background: #e6e6e6;
-            color: #999;
-        }
+        .plate-pill.empty { background: var(--bg-inset); color: var(--text-muted); }
         .result-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -139,32 +134,23 @@
             padding: 0 1rem 1rem;
         }
         .field {
-            background: #fff;
+            background: var(--bg-card);
             border-radius: 14px;
             padding: 0.8rem 0.9rem;
             min-height: 72px;
-            border: 1px solid #f0f0f0;
+            border: 1px solid var(--border-alt);
         }
         .field.full { grid-column: 1 / -1; }
         .field-label {
-            color: #9f9f9f;
+            color: var(--text-muted);
             font-size: 0.68rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             margin-bottom: 0.3rem;
         }
-        .field-value {
-            font-size: 0.86rem;
-            font-weight: 600;
-            word-break: break-word;
-            line-height: 1.4;
-        }
-        .field-value.empty {
-            color: #d0d0d0;
-            font-style: italic;
-            font-weight: 400;
-        }
+        .field-value { font-size: 0.86rem; font-weight: 600; word-break: break-word; line-height: 1.4; }
+        .field-value.empty { color: var(--text-faint); font-style: italic; font-weight: 400; }
         .actions {
             display: flex;
             gap: 0.6rem;
@@ -188,31 +174,33 @@
             text-decoration: none;
             transition: all 0.15s;
         }
-        .btn-dark { background: #111; color: #fff; }
-        .btn-dark:hover { background: #333; }
+        .btn-dark { background: var(--accent); color: var(--accent-inv); }
+        .btn-dark:hover { opacity: 0.82; }
         .btn-outline {
-            background: #fff;
-            color: #111;
-            border: 2px solid #e5e5e5;
+            background: var(--bg-card);
+            color: var(--text);
+            border: 2px solid var(--border);
         }
-        .btn-outline:hover { border-color: #ccc; background: #fafafa; }
+        .btn-outline:hover { border-color: var(--text-muted); background: var(--bg-subtle); }
         .btn svg { width: 16px; height: 16px; }
-        footer {
-            text-align: center;
-            color: #ddd;
-            font-size: 0.72rem;
-            margin-top: 2rem;
-        }
+        footer { text-align: center; color: var(--text-faint); font-size: 0.72rem; margin-top: 2rem; }
         @media (max-width: 720px) {
             .summary-grid { grid-template-columns: repeat(2, 1fr); }
             .result-grid { grid-template-columns: 1fr; }
         }
     </style>
+    <script>
+        (function(){
+            let s; try { s = localStorage.getItem('oliscan-dark'); } catch(e){}
+            const sys = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (s !== null ? s === '1' : sys) document.documentElement.classList.add('dark');
+        })();
+    </script>
 </head>
 <body>
     <div class="app">
         <div class="header">
-            <span class="header-tag">Batch Result</span>
+            <span class="header-tag">🫒 OliScan</span>
             <h1>{{ total_files }} files processed</h1>
             <p>Review each extraction below, then export everything as XML or open the destination sheet.</p>
         </div>
@@ -348,7 +336,7 @@
             {% endif %}
         </div>
 
-        <footer>Powered by Tesseract &amp; Flask</footer>
+        <footer>🫒 OliScan &mdash; Powered by Tesseract &amp; Flask</footer>
     </div>
 
     <script>
