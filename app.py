@@ -26,7 +26,7 @@ app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", os.urandom(32).hex())
 
 # ── Version ────────────────────────────────────────────────
-APP_VERSION = "5.0.0"
+APP_VERSION = "5.1.1"
 
 # ── Configuration ──────────────────────────────────────────
 UPLOAD_FOLDER = Path(__file__).parent / "uploads"
