@@ -928,47 +928,54 @@
             const xhr = new XMLHttpRequest();
             xhr.open('POST', form.action);
 
-            /* ---- Upload phase: 0 → 40 % (real) ---- */
+            /* ---- Upload phase: 0 → 8 % (real) ---- */
             xhr.upload.addEventListener('progress', event => {
                 if (!event.lengthComputable) return;
-                const pct = (event.loaded / event.total) * 40;
+                const pct = (event.loaded / event.total) * 8;
                 setProgress(pct, 'Uploading files…');
             });
 
-            /* ---- OCR phase: 40 → 95 % (linear) ---- */
+            /* ---- OCR phase: 8 → 99 % (linear then slow crawl) ---- */
             xhr.upload.addEventListener('load', () => {
-                setProgress(42, 'Analyzing images…');
-                const ceiling = 95;
+                setProgress(10, 'Analyzing images…');
                 const fileCount = fileInput.files.length;
-                const estimatedMs = fileCount * 18000;   // 18 s per file budget
-                const tick = 250;
+                const linearMs  = fileCount * 25000;   // linear phase budget
+                const tick = 300;
                 const startTime = Date.now();
+                const LO = 10;      // start of OCR range
+                const MID = 80;     // end of linear phase
+                const HI = 99;      // asymptotic ceiling
 
                 const labels = [
-                    [42, 'Analyzing images…'],
-                    [50, 'Running OCR engine…'],
-                    [58, 'Extracting text blocks…'],
-                    [66, 'Parsing document fields…'],
-                    [74, 'Matching EU field codes…'],
-                    [82, 'Validating extracted data…'],
-                    [90, 'Preparing results…'],
+                    [10, 'Analyzing images…'],
+                    [22, 'Pre-processing image…'],
+                    [34, 'Running OCR engine…'],
+                    [46, 'Extracting text blocks…'],
+                    [56, 'Parsing document fields…'],
+                    [66, 'Matching EU field codes…'],
+                    [76, 'Validating extracted data…'],
+                    [88, 'Preparing results…'],
                 ];
 
                 processingTimer = setInterval(() => {
                     const elapsed = Date.now() - startTime;
-                    const ratio = Math.min(1, elapsed / estimatedMs);
-                    const value = 42 + (ceiling - 42) * ratio;
+                    let value;
+
+                    if (elapsed <= linearMs) {
+                        /* Phase 1: steady linear 10 → 80 % */
+                        value = LO + (MID - LO) * (elapsed / linearMs);
+                    } else {
+                        /* Phase 2: slow crawl 80 → 99 % (never stops) */
+                        const extra = elapsed - linearMs;
+                        const crawlK = linearMs * 1.5;     // controls crawl speed
+                        value = MID + (HI - MID) * (extra / (extra + crawlK));
+                    }
 
                     let lbl = null;
                     for (let i = labels.length - 1; i >= 0; i--) {
                         if (value >= labels[i][0]) { lbl = labels[i][1]; break; }
                     }
                     setProgress(value, lbl);
-
-                    if (value >= ceiling - 0.2) {
-                        clearInterval(processingTimer);
-                        processingTimer = null;
-                    }
                 }, tick);
             });
 
