@@ -935,25 +935,28 @@
                 setProgress(pct, 'Uploading files…');
             });
 
-            /* ---- OCR phase: 40 → 96 % (ease-out curve) ---- */
+            /* ---- OCR phase: 40 → 95 % (linear) ---- */
             xhr.upload.addEventListener('load', () => {
                 setProgress(42, 'Analyzing images…');
-                const ceiling = 96;
+                const ceiling = 95;
                 const fileCount = fileInput.files.length;
-                const estimatedMs = fileCount * 15000;
-                const tick = 150;
+                const estimatedMs = fileCount * 18000;   // 18 s per file budget
+                const tick = 250;
                 const startTime = Date.now();
 
                 const labels = [
                     [42, 'Analyzing images…'],
-                    [55, 'Running OCR extraction…'],
-                    [72, 'Matching document fields…'],
-                    [85, 'Preparing results…'],
+                    [50, 'Running OCR engine…'],
+                    [58, 'Extracting text blocks…'],
+                    [66, 'Parsing document fields…'],
+                    [74, 'Matching EU field codes…'],
+                    [82, 'Validating extracted data…'],
+                    [90, 'Preparing results…'],
                 ];
 
                 processingTimer = setInterval(() => {
                     const elapsed = Date.now() - startTime;
-                    const ratio = 1 - Math.exp(-2.8 * elapsed / estimatedMs);
+                    const ratio = Math.min(1, elapsed / estimatedMs);
                     const value = 42 + (ceiling - 42) * ratio;
 
                     let lbl = null;
