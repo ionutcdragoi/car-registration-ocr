@@ -609,12 +609,35 @@
                 </div>
             </div>
 
-            <!-- About / Version -->
+            <!-- About / Version + Changelog -->
             <div class="drawer-section" style="margin-top: auto;">
                 <div class="drawer-section-label">About</div>
-                <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
                     <span style="font-size:0.85rem; font-weight:500;">🫒 OliScan</span>
                     <span style="font-size:0.78rem; color:var(--text-muted); font-family:'SF Mono','Fira Code',monospace; background:var(--bg-inset); padding:0.2rem 0.55rem; border-radius:8px; font-weight:600;">v{{ app_version }}</span>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:0.6rem;">
+                    <div style="font-size:0.72rem; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; color:var(--text-faint);">Changelog</div>
+
+                    <div style="display:flex; gap:0.6rem; align-items:flex-start;">
+                        <span style="font-size:0.7rem; font-family:'SF Mono','Fira Code',monospace; font-weight:700; color:var(--text-muted); background:var(--bg-inset); padding:0.15rem 0.45rem; border-radius:6px; flex-shrink:0;">v4</span>
+                        <span style="font-size:0.78rem; color:var(--text-muted); line-height:1.4;">OliScan rebrand &amp; olive logo, settings drawer, dark / light mode, fixed button layout on mobile, 1-worker deploy fix</span>
+                    </div>
+
+                    <div style="display:flex; gap:0.6rem; align-items:flex-start;">
+                        <span style="font-size:0.7rem; font-family:'SF Mono','Fira Code',monospace; font-weight:700; color:var(--text-muted); background:var(--bg-inset); padding:0.15rem 0.45rem; border-radius:6px; flex-shrink:0;">v3</span>
+                        <span style="font-size:0.78rem; color:var(--text-muted); line-height:1.4;">User-supplied Google credentials (never stored), production hardening, Dockerfile &amp; Railway deploy, health endpoint</span>
+                    </div>
+
+                    <div style="display:flex; gap:0.6rem; align-items:flex-start;">
+                        <span style="font-size:0.7rem; font-family:'SF Mono','Fira Code',monospace; font-weight:700; color:var(--text-muted); background:var(--bg-inset); padding:0.15rem 0.45rem; border-radius:6px; flex-shrink:0;">v2</span>
+                        <span style="font-size:0.78rem; color:var(--text-muted); line-height:1.4;">Multi-file batch upload, smooth progress bar, CSV export, Copy for Excel (clipboard TSV)</span>
+                    </div>
+
+                    <div style="display:flex; gap:0.6rem; align-items:flex-start;">
+                        <span style="font-size:0.7rem; font-family:'SF Mono','Fira Code',monospace; font-weight:700; color:var(--text-muted); background:var(--bg-inset); padding:0.15rem 0.45rem; border-radius:6px; flex-shrink:0;">v1</span>
+                        <span style="font-size:0.78rem; color:var(--text-muted); line-height:1.4;">Initial release — Tesseract OCR for Romanian car registrations, XML export, Google Sheets integration</span>
+                    </div>
                 </div>
             </div>
 
